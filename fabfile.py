@@ -2,7 +2,7 @@ from fabric.api import *
 
 env.PROJECT_NAME = "encore-poem"
 env.GITHUB_USER = "skoczen"
-env.GITHUB_REPO = PROJECT_NAME
+env.GITHUB_REPO = env.PROJECT_NAME
 env.VIRTUALENV_NAME = "encore"
 
 
@@ -17,7 +17,7 @@ def initial_setup(cmd):
 
 def run_ve(cmd):
     env.cmd = cmd
-    local("source ~/.virtualenvs/%(VIRTUALENV_NAME)s/bin/activate;cd ~/workingCopy/%(PROJECT_NAME)s/project;%(cmd)s" % env)
+    local("source ~/.virtualenvs/%(VIRTUALENV_NAME)s/bin/activate;cd project;%(cmd)s" % env)
 
 def deploy():
     run_ve("./manage.py collectstatic --noinput --settings=envs.live")
