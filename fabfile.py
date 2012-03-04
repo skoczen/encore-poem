@@ -4,6 +4,7 @@ env.PROJECT_NAME = "encore-poem"
 env.GITHUB_USER = "skoczen"
 env.GITHUB_REPO = env.PROJECT_NAME
 env.VIRTUALENV_NAME = "encore"
+env.VIRTUALENV_NAME = env.PROJECT_NAME
 
 
 def initial_setup(cmd):

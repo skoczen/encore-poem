@@ -1,11 +1,3 @@
-# heroku config:add AWS_ACCESS_KEY_ID="foo-bar-etc"
-
-from os import environ
-
-def set_env_fallback(key):
-    if (not key in globals() or globals()[key]) and key in environ:
-        globals()[key] = environ[key]
-
 AWS_ACCESS_KEY_ID = None
 AWS_SECRET_ACCESS_KEY = None
 AWS_STORAGE_BUCKET_NAME = None
@@ -13,6 +5,16 @@ DB_PASSWORD = None
 GAUGES_SITE_ID = None
 GOOGLE_ANALYTICS_PROPERTY_ID = None
 WOOPRA_DOMAIN = None
+
+try:
+    from keys_and_passwords_private import *
+except:
+    pass
+from os import environ
+
+def set_env_fallback(key):
+    if (not key in globals() or globals()[key]) and key in environ:
+        globals()[key] = environ[key]
 
 set_env_fallback(AWS_ACCESS_KEY_ID)
 set_env_fallback(AWS_SECRET_ACCESS_KEY)
