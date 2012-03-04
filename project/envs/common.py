@@ -3,7 +3,7 @@ from sys import path
 from envs.keys_and_passwords import *
 
 PROJECT_ROOT = abspath(join(dirname(__file__), "../"))
-APPS_DIR = abspath(join(dirname(__file__), "apps"))
+APPS_DIR = abspath(join(dirname(__file__), "../", "apps"))
 path.insert(0, PROJECT_ROOT)
 path.insert(0, APPS_DIR)
 
