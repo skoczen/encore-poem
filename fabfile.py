@@ -5,6 +5,7 @@ env.GITHUB_USER = "skoczen"
 env.GITHUB_REPO = PROJECT_NAME
 env.VIRTUALENV_NAME = "encore"
 
+
 def initial_setup(cmd):
     local("mkvirtualenv %(VIRTUALENV_NAME)s")
     local("echo cd `pwd` >> ~/.virtualenvs/%(VIRTUALENV_NAME)s/bin/postactivate" % env)
@@ -13,7 +14,6 @@ def initial_setup(cmd):
     local("git push -u origin")
     local("source ~/.virtualenvs/%(VIRTUALENV_NAME)s/bin/activate; pip install -r requirements.unstable.txt" % env)
     local("source ~/.virtualenvs/%(VIRTUALENV_NAME)s/bin/activate; pip freeze requirements.unstable.txt > requirements.txt" % env)
-
 
 def run_ve(cmd):
     env.cmd = cmd
