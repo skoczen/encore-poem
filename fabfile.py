@@ -1,10 +1,9 @@
 from fabric.api import *
-import os
 
-env.PROJECT_NAME = "my-new-project"
+env.PROJECT_NAME = "encore-poem"
 env.GITHUB_USER = "skoczen"
 env.GITHUB_REPO = PROJECT_NAME
-env.VIRTUALENV_NAME = PROJECT_NAME
+env.VIRTUALENV_NAME = "encore"
 
 def initial_setup(cmd):
     local("mkvirtualenv %(VIRTUALENV_NAME)s")
@@ -12,6 +11,8 @@ def initial_setup(cmd):
     local("git remote rename origin artechetype")
     local("git remote set-url origin git@github.com:%(GITHUB_USER)s/%(GITHUB_REPO)s.git" % env)
     local("git push -u origin")
+    local("source ~/.virtualenvs/%(VIRTUALENV_NAME)s/bin/activate; pip install -r requirements.unstable.txt" % env)
+    local("source ~/.virtualenvs/%(VIRTUALENV_NAME)s/bin/activate; pip freeze requirements.unstable.txt > requirements.txt" % env)
 
 
 def run_ve(cmd):
