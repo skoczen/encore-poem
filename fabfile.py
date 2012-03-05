@@ -1,13 +1,12 @@
 from fabric.api import *
 
-env.PROJECT_NAME = "artechetype"
+env.PROJECT_NAME = "encore-poem"
 env.GITHUB_USER = "skoczen"
 env.GITHUB_REPO = env.PROJECT_NAME
-env.VIRTUALENV_NAME = env.PROJECT_NAME
+env.VIRTUALENV_NAME = "encore"
 env.HEROKU_APP_NAME = env.PROJECT_NAME
 # If you're using https://github.com/ddollar/heroku-accounts
 env.HEROKU_ACCOUNT = None
-
 
 def initial_setup(cmd):
     local("mkvirtualenv %(VIRTUALENV_NAME)s")
