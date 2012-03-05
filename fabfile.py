@@ -4,12 +4,16 @@ env.PROJECT_NAME = "encore-poem"
 env.GITHUB_USER = "skoczen"
 env.GITHUB_REPO = env.PROJECT_NAME
 env.VIRTUALENV_NAME = "encore"
+env.HEROKU_APP_NAME = env.PROJECT_NAME
 
 def initial_setup(cmd):
     local("mkvirtualenv %(VIRTUALENV_NAME)s")
     local("echo cd `pwd` >> ~/.virtualenvs/%(VIRTUALENV_NAME)s/bin/postactivate" % env)
     local("git remote rename origin artechetype")
     local("git remote set-url origin git@github.com:%(GITHUB_USER)s/%(GITHUB_REPO)s.git" % env)
+    if env.HEROKU_APP_NAME:
+        local("git remote add heroku git@heroku.com:%(HEROKU_APP_NAME)s.git" % env)
+
     local("git push -u origin")
     local("source ~/.virtualenvs/%(VIRTUALENV_NAME)s/bin/activate; pip install -r requirements.unstable.txt" % env)
     local("source ~/.virtualenvs/%(VIRTUALENV_NAME)s/bin/activate; pip freeze requirements.unstable.txt > requirements.txt" % env)

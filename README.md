@@ -93,3 +93,5 @@ Deploying
 ---------
 
 * `fab deploy`
+
+Note: If you haven't created the AWS bucket, simply running `./manage.py sync_static` will do it for you.
