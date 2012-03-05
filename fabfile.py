@@ -9,7 +9,7 @@ env.HEROKU_APP_NAME = env.PROJECT_NAME
 env.HEROKU_ACCOUNT = None
 
 def initial_setup(cmd):
-    local("mkvirtualenv %(VIRTUALENV_NAME)s")
+    local("mkvirtualenv %(VIRTUALENV_NAME)s --no-site-packages")
     local("echo cd `pwd` >> ~/.virtualenvs/%(VIRTUALENV_NAME)s/bin/postactivate" % env)
     local("git remote rename origin artechetype")
     local("git remote set-url origin git@github.com:%(GITHUB_USER)s/%(GITHUB_REPO)s.git" % env)
