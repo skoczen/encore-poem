@@ -8,6 +8,7 @@ django-extensions
 django-selector
 django-staticfiles
 django-storages
+django-ses
 fabric
 gunicorn
 lxml

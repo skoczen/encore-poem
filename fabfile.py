@@ -5,6 +5,8 @@ env.GITHUB_USER = "skoczen"
 env.GITHUB_REPO = env.PROJECT_NAME
 env.VIRTUALENV_NAME = "encore"
 env.HEROKU_APP_NAME = env.PROJECT_NAME
+# If you're using https://github.com/ddollar/heroku-accounts
+env.HEROKU_ACCOUNT = None
 
 def initial_setup(cmd):
     local("mkvirtualenv %(VIRTUALENV_NAME)s --no-site-packages")
@@ -12,7 +14,10 @@ def initial_setup(cmd):
     local("git remote rename origin artechetype")
     local("git remote set-url origin git@github.com:%(GITHUB_USER)s/%(GITHUB_REPO)s.git" % env)
     if env.HEROKU_APP_NAME:
-        local("git remote add heroku git@heroku.com:%(HEROKU_APP_NAME)s.git" % env)
+        if env.HEROKU_ACCOUNT:
+            local("git remote add heroku git@heroku.%(HEROKU_ACCOUNT)s:%(HEROKU_APP_NAME)s.git" % env)
+        else:
+            local("git remote add heroku git@heroku.com:%(HEROKU_APP_NAME)s.git" % env)
 
     local("git push -u origin")
     local("source ~/.virtualenvs/%(VIRTUALENV_NAME)s/bin/activate; pip install -r requirements.unstable.txt" % env)
