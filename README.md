@@ -13,10 +13,11 @@ Grab it and go
 	git clone git@github.com:skoczen/artechetype.git mynewproject.git
 	```
 
-
 3. Set `PROJECT_NAME`, `GITHUB_REPO` and any other env settings you need in `fabfile.py`
 
-4. Set up the your virtualenv and remotes manually, or by using the fab helper command.
+4. Set up the your virtualenv, and `pip install fabric`
+
+5. Set up your remotes manually, or by use the fab helper command.
 	
 	```bash
 	fab initial_setup
@@ -60,7 +61,7 @@ Preparing
 heroku addons:add custom_domains:basic
 heroku addons:add zerigo_dns:basic
 heroku addons:add memcache:5mb
-heroku addons:upgrade logging:expanded
+heroku addons:add logging:expanded
 heroku addons:add redistogo:nano
 	```
 
@@ -73,21 +74,23 @@ heroku addons:add redistogo:nano
 
 5. Set your keys
 
-	* If you have a private repo, you can use `keys_and_passwords.py`.
-	* If you have a public repo, you're best off setting them as environment variables in your deployment environment.  For example:
+	* If you have a private repo, you can set the keys directly in `keys_and_passwords.py`.
+	* If you have a public repo:
+		* You're best off setting them as environment variables in your deployment environment.  
+			```bash
+			heroku config:add AWS_ACCESS_KEY_ID=foo-bar-1
+			```
+		* For local usage, set the keys in `keys_and_passwords_private.py`
 
-	```bash
-	heroku config:add AWS_ACCESS_KEY_ID=foo-bar-1
-	```
-
-	* Keys you're likely want to set:
+	Keys you're likely want to set:
 		```bash
 		heroku config:add AWS_ACCESS_KEY_ID=foo`
 		heroku config:add AWS_SECRET_ACCESS_KEY=bar
 		heroku config:add AWS_STORAGE_BUCKET_NAME=myproject
 		heroku config:add DB_PASSWORD=pass1234
+		# analytics settings.
 		```
-	* You can also set analytics settings.
+	
 
 Deploying
 ---------
