@@ -1,4 +1,4 @@
-var ANIMATION_CONSTANT = 0.1;
+var ANIMATION_CONSTANT = 1;
 var MIN_RED_WORD_DISTANCE = 40;
 var RED_WORD_PADDING = 80;
 var win_height, win_width;
@@ -6,6 +6,7 @@ var main_delay_counter = 0;
 var softly_delay_counter = 0;
 var zoomed_in = false;
 var in_main_animation = false;
+var soil_1_initial_position = 0;
 var red_word_coordinates = new Array();
 var red_word_fadeout_timeouts = {};
 var has_seen_tulips = false;
@@ -29,7 +30,8 @@ $(function(){
 	make_visible_and_animate_in("main_delay_counter", "poem word.softly", 1000, 1000);
 	make_visible_and_animate_in("main_delay_counter", "poem word.wilted", 1000, 1000);
 	$("poem word").click(poem_word_clicked);
-	$("poem").bind("mouseover", poem_moused_over);
+	// $("poem").bind("mouseover", poem_moused_over);
+	$("poem word").bind("mouseover", poem_word_moused_over);
 	$("poem").bind("mouseout", poem_moused_out);
 	$("#red_explosion word").bind("mouseover", red_mouseover);
 	$("#red_explosion word").bind("mouseout", red_mouseout);
@@ -151,12 +153,17 @@ function poem_moused_over() {
 			$("poem word.wilted").animate({'opacity': 0.9}, 1000*ANIMATION_CONSTANT);
 			$("poem word:not(.wilted)").animate({'opacity': 0.5}, 1000*ANIMATION_CONSTANT);
 		}}}}	
-	}
-	
+	}	
+}
+function poem_word_moused_over() {
+	var word = $(this);
+	word.animate({'opacity': 0.9}, 200*ANIMATION_CONSTANT);
+
+	$("poem word:not(." + word.attr("class") + ")").animate({'opacity': 0.4}, 200*ANIMATION_CONSTANT);
 }
 
 function poem_moused_out() {
-	$("poem word").animate({'opacity': 0.7}, 1000*ANIMATION_CONSTANT);
+	$("poem word").animate({'opacity': 0.7}, 500*ANIMATION_CONSTANT);
 }
 
 function tulips_mouseover() {
@@ -210,8 +217,17 @@ function start_tulips() {
 	$(window).bind("mousemove.tulips", tulip_mousemoved);
 	$("poem").animate({"top":win_height-35, "left": win_width-90}, 2000*ANIMATION_CONSTANT);
 	$("#tulips_explosion word").css({'margin-top': tulip_scroll_top_cutoff})
+
+	
+
 	$("explosion#tulips_explosion")
-		.css({'opacity': 0, 'width':win_width, 'height':win_height, 'display': 'block'})
+		.css({'opacity': 0, 'width':win_width, 'height':win_height, 'display': 'block', })
+		.animate({scrollLeft: 0}, 0);
+	
+	soil_1_initial_position = $("#soil_1").position().left;
+	soil_2_initial_position = $("#soil_word_2").position().left;
+	$("explosion#tulips_explosion")
+		.animate({scrollLeft: soil_1_initial_position}, 0)
 		.animate({'opacity': 1}, 2000*ANIMATION_CONSTANT)
 		.addClass("current");
 
@@ -225,7 +241,17 @@ function start_tulip_scroll() {
 
 function tulipscroll() {
 	// check the position of #soil_word_2, reset if needed.
-	console.log(tulip_scroll_speed);
+	var soil2_left = $("#soil_word_2").offset().left;
+	if (soil2_left < win_width * 0.2) {
+		$("#tulips_explosion").stop().animate({scrollLeft: soil_1_initial_position-soil2_left}, 0);
+	} else {
+		var soil1_left = $("#soil_1").offset().left;
+		if (soil1_left > win_width *0.8) {
+			$("#tulips_explosion").stop().animate({scrollLeft: soil_2_initial_position-soil1_left}, 0);
+		}
+	}
+	
+
 	var speed =  (tulip_scroll_speed * 20);
 	
 	var scroll_string = "+="+ speed;
