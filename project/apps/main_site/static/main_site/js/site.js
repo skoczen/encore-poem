@@ -2,38 +2,52 @@ var ANIMATION_CONSTANT = 0.1;
 var MIN_RED_WORD_DISTANCE = 40;
 var RED_WORD_PADDING = 80;
 var win_height, win_width;
-var current_delay_counter = 0;
+var main_delay_counter = 0;
+var softly_delay_counter = 0;
 var zoomed_in = false;
+var in_main_animation = false;
 var red_word_coordinates = new Array();
+var red_word_fadeout_timeouts = {};
+var has_seen_tulips = false;
+var has_seen_red = false;
+var has_seen_softly = false;
+var has_seen_wilted = false;
+var tulip_scroll_speed = 0.5;
+var tulip_scroll_timeout = false;
+var tulip_scroll_top_cutoff = 0;
+var tulip_scroll_bottom_cutoff = 0;
+var TULIP_SCROLL_INTERVAL_TIME = 50; //ms
 
 $(function(){
 	resized();
 	$("h1.title").css("margin-top",win_height/2 - $("h1.title").height()/2);
 	$("poem").css("top",win_height/2 - $("poem").height()/2).css({"left":win_width/2 - $("poem").width()/2});
-	animate_action("h1.title", "fadeIn(1000*ANIMATION_CONSTANT)", 4000);
-	animate_action("h1.title", "fadeOut(1000*ANIMATION_CONSTANT)", 2000);
-	make_visible_and_animate_in("poem word.tulips", 1000, 1000);
-	make_visible_and_animate_in("poem word.red", 1000, 2000);
-	make_visible_and_animate_in("poem word.softly", 1000, 1000);
-	make_visible_and_animate_in("poem word.wilted", 1000, 1000);
+	animate_action("main_delay_counter", "h1.title", "fadeIn(1000*ANIMATION_CONSTANT)", 4000);
+	animate_action("main_delay_counter", "h1.title", "fadeOut(1000*ANIMATION_CONSTANT)", 2000);
+	make_visible_and_animate_in("main_delay_counter", "poem word.tulips", 1000, 1000);
+	make_visible_and_animate_in("main_delay_counter", "poem word.red", 1000, 2000);
+	make_visible_and_animate_in("main_delay_counter", "poem word.softly", 1000, 1000);
+	make_visible_and_animate_in("main_delay_counter", "poem word.wilted", 1000, 1000);
 	$("poem word").click(poem_word_clicked);
+	$("poem").bind("mouseover", poem_moused_over);
+	$("poem").bind("mouseout", poem_moused_out);
 	$("#red_explosion word").bind("mouseover", red_mouseover);
 	$("#red_explosion word").bind("mouseout", red_mouseout);
-	$("#tulips_explosion word").bind("mouseover", tulips_mouseover);
-	$("#tulips_explosion word").bind("mouseout", tulips_mouseout);
+	$("#tulips_explosion word:not(.center)").bind("mouseover", tulips_mouseover);
+	$("#tulips_explosion word:not(.center)").bind("mouseout", tulips_mouseout);
 });
 
-function animate_action(target, action, wait_after) {
+function animate_action(counter_name, target, action, wait_after) {
 	// ugh, eval
-	// console.log("$(\"" + target + "\").delay("+current_delay_counter*ANIMATION_CONSTANT+")." + action + ";")
-	eval("$(\"" + target + "\").delay("+current_delay_counter*ANIMATION_CONSTANT+")." + action + ";")
+	console.log("$(\"" + target + "\").delay("+counter_name+ "*ANIMATION_CONSTANT)." + action + ";")
+	eval("$(\"" + target + "\").delay("+counter_name+ "*ANIMATION_CONSTANT)." + action + ";")
 	if (wait_after != undefined) {
-		current_delay_counter += wait_after*ANIMATION_CONSTANT;
+		eval(counter_name + "+= wait_after*ANIMATION_CONSTANT;");
 	}
 }
 
-function make_visible_and_animate_in(target, animation_time, post_delay) {
-	animate_action(target, "css({opacity: 0.0, visibility: 'visible'}).animate({opacity: 1.0}, "+animation_time*ANIMATION_CONSTANT+")", post_delay*ANIMATION_CONSTANT);
+function make_visible_and_animate_in(counter_name, target, animation_time, post_delay) {
+	animate_action(counter_name, target, "css({opacity: 0.0, visibility: 'visible'}).animate({opacity: 0.7}, "+animation_time*ANIMATION_CONSTANT+")", post_delay*ANIMATION_CONSTANT);
 }
 
 function resized() {
@@ -41,59 +55,197 @@ function resized() {
 	win_width = $(window).width();
 	MIN_RED_WORD_DISTANCE = win_height*win_width / 21000;
 	RED_WORD_PADDING = MIN_RED_WORD_DISTANCE*2;
+	tulip_scroll_top_cutoff = win_height*0.4;
+	tulip_scroll_bottom_cutoff = win_height*0.4 + $("#tulips_explosion").height();
 }
 function poem_word_clicked() {
 	var word = $(this);
 	var id = word.attr("id").substring(10);
-	if (zoomed_in) {
-		$("poem").animate({"top":win_height/2 - $("poem").height()/2, "left": win_width/2 - $("poem").width()/2}, 2000*ANIMATION_CONSTANT);	
-		$("explosion.current").animate({'opacity': 0}, 2000*ANIMATION_CONSTANT);
-		zoomed_in = false;
-	} else {
-		switch (id) {
+	if (!in_main_animation) {
+		in_main_animation = true;
+		if (zoomed_in) {
+			
+			switch (id) {
 
-			case "tulips":
-				$("poem").animate({"top":win_height-35, "left": win_width-90}, 2000*ANIMATION_CONSTANT);
-				$("explosion#"+id+"_explosion").animate({'opacity': 0}, 0).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT).addClass("current");
-				break;
+				case "tulips":
+					end_tulips()
+					break;
 
-			case "red":
-				$("poem").animate({"top":win_height-35, "left": -90}, 2000*ANIMATION_CONSTANT);	
-				setTimeout(red_start, 3500*ANIMATION_CONSTANT);
-				
-				break;
+				case "red":
+					red_end();
+					break;
 
-			case "softly":
-				$("poem").animate({"top":-35, "left": win_width-75}, 2000*ANIMATION_CONSTANT);	
-				$("explosion#"+id+"_explosion").animate({'opacity': 0}, 0).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT).addClass("current");
-				break;
+				// case "softly":
+				// 	$("poem").animate({"top":-35, "left": win_width-75}, 2000*ANIMATION_CONSTANT);	
+				// 	$("explosion#"+id+"_explosion").css({'opacity': 0}).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT).addClass("current");
+				// 	break;
 
-			case "wilted":
-				$("poem").animate({"top":-35, "left": -70}, 2000*ANIMATION_CONSTANT);	
-				$("explosion#"+id+"_explosion").animate({'opacity': 0}, 0).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT).addClass("current");
-				break;
+				// case "wilted":
+				// 	$("poem").animate({"top":-35, "left": -70}, 2000*ANIMATION_CONSTANT);	
+				// 	$("explosion#"+id+"_explosion").css({'opacity': 0}).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT).addClass("current");
+				// 	break;
 
-			default:
-				break;
+				default:
+					$("poem").animate({"top":win_height/2 - $("poem").height()/2, "left": win_width/2 - $("poem").width()/2}, 2000*ANIMATION_CONSTANT);	
+					$("explosion.current").animate({'opacity': 0}, 2000*ANIMATION_CONSTANT);
+					setTimeout(clear_main_animation_flag, 2000*ANIMATION_CONSTANT);
+			}
+			zoomed_in = false;
+		} else {
+			switch (id) {
+
+				case "tulips":
+					start_tulips();
+					setTimeout(clear_main_animation_flag, 2000*ANIMATION_CONSTANT);
+					has_seen_tulips = true;
+					break;
+
+				case "red":
+					$("poem").animate({"top":win_height-35, "left": -90}, 2000*ANIMATION_CONSTANT);	
+					setTimeout(clear_main_animation_flag, 2000*ANIMATION_CONSTANT);
+					setTimeout(red_start, 3500*ANIMATION_CONSTANT);
+					has_seen_red = true;
+					break;
+
+				case "softly":
+					$("poem").animate({"top":-35, "left": win_width-75}, 2000*ANIMATION_CONSTANT);	
+					setTimeout(softly_start, 3500*ANIMATION_CONSTANT)
+					setTimeout(clear_main_animation_flag, 2000*ANIMATION_CONSTANT);
+					has_seen_softly = true;
+					break;
+
+				case "wilted":
+					$("poem").animate({"top":-35, "left": -70}, 2000*ANIMATION_CONSTANT);	
+					$("explosion#"+id+"_explosion").css({'opacity': 0}).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT).addClass("current");
+					setTimeout(clear_main_animation_flag, 2000*ANIMATION_CONSTANT);
+					has_seen_wilted = true;
+					break;
+
+				default:
+					break;
+			}
+			zoomed_in = true;
 		}
-		zoomed_in = true;
 	}
 }
 
+function clear_main_animation_flag() {
+	in_main_animation = false;
+}
+
+function poem_moused_over() {
+	if (!zoomed_in) {
+		if (!has_seen_tulips) {
+			$("poem word.tulips").animate({'opacity': 0.9}, 1000*ANIMATION_CONSTANT);
+			$("poem word:not(.tulips)").animate({'opacity': 0.5}, 1000*ANIMATION_CONSTANT);
+		} else {
+		if (!has_seen_red) {
+			$("poem word.red").animate({'opacity': 0.9}, 1000*ANIMATION_CONSTANT);
+			$("poem word:not(.red)").animate({'opacity': 0.5}, 1000*ANIMATION_CONSTANT);	
+		} else {
+		if (!has_seen_softly) {
+			$("poem word.softly").animate({'opacity': 0.9}, 1000*ANIMATION_CONSTANT);
+			$("poem word:not(.softly)").animate({'opacity': 0.5}, 1000*ANIMATION_CONSTANT);
+		} else {
+		if (!has_seen_wilted) {
+			$("poem word.wilted").animate({'opacity': 0.9}, 1000*ANIMATION_CONSTANT);
+			$("poem word:not(.wilted)").animate({'opacity': 0.5}, 1000*ANIMATION_CONSTANT);
+		}}}}	
+	}
+	
+}
+
+function poem_moused_out() {
+	$("poem word").animate({'opacity': 0.7}, 1000*ANIMATION_CONSTANT);
+}
 
 function tulips_mouseover() {
-	var callout = $("#" + $(this).attr("callout_id"));
-	callout.show();
+	var word = $(this);
+	word.addClass("current");
+	var callouts = $("callout[callout_id=" + $(this).attr("callout_id") + "]");
+	callouts.each(function(){
+		var callout = $(this);
+		var top = false;
+		if (callout.hasClass("below")){
+			top = word.height()+ 40;
+		} else {
+			top = -1*callout.height() + 10;
+		}
+		callout.css({'display':'block', 'top': "-10000"}).css({'top':top });
+	});
+	
+
 }
 function tulips_mouseout() {
-	var callout = $("#" + $(this).attr("callout_id"));
+	var word = $(this);
+	word.removeClass("current");
+	var callout = $("callout[callout_id=" + $(this).attr("callout_id") + "]");
 	callout.hide();
 }
 
+function tulip_mousemoved(e) {
+	// if (e.pageY < tulip_scroll_top_cutoff || e.pageY > tulip_scroll_bottom_cutoff ) {
+		tulip_scroll_speed = (e.pageX / win_width) - 0.5;
+		if ( Math.abs(tulip_scroll_speed) < 0.05 ) {
+			tulip_scroll_speed = 0;
+		} else {
+			is_negative = tulip_scroll_speed < 0;
+
+			tulip_scroll_speed = (tulip_scroll_speed * tulip_scroll_speed)*3;
+			if (is_negative) {
+				tulip_scroll_speed = tulip_scroll_speed * -1;
+			}
+			// if (is_negative) {
+			// 	tulip_scroll_speed = -0.4; 
+			// } else {
+			// 	tulip_scroll_speed = 0.6
+			// }
+		}
+
+	// }
+}
+
+function start_tulips() {
+	tulip_scroll_speed = 0.5;
+	$(window).bind("mousemove.tulips", tulip_mousemoved);
+	$("poem").animate({"top":win_height-35, "left": win_width-90}, 2000*ANIMATION_CONSTANT);
+	$("#tulips_explosion word").css({'margin-top': tulip_scroll_top_cutoff})
+	$("explosion#tulips_explosion")
+		.css({'opacity': 0, 'width':win_width, 'height':win_height, 'display': 'block'})
+		.animate({'opacity': 1}, 2000*ANIMATION_CONSTANT)
+		.addClass("current");
+
+	setTimeout(start_tulip_scroll, 1000);
+}
+
+function start_tulip_scroll() {
+	tulip_scroll_timeout = setInterval(tulipscroll, TULIP_SCROLL_INTERVAL_TIME);
+}
+
+
+function tulipscroll() {
+	// check the position of #soil_word_2, reset if needed.
+	console.log(tulip_scroll_speed);
+	var speed =  (tulip_scroll_speed * 20);
+	
+	var scroll_string = "+="+ speed;
+	$("#tulips_explosion").stop().animate({
+		scrollLeft: scroll_string,
+	}, TULIP_SCROLL_INTERVAL_TIME, "linear");	
+}
+
+function end_tulips() {
+	$(window).unbind("mousemove.tulips");
+	$("poem").animate({"top":win_height/2 - $("poem").height()/2, "left": win_width/2 - $("poem").width()/2}, 2000*ANIMATION_CONSTANT);	
+	setTimeout(clear_main_animation_flag, 2000*ANIMATION_CONSTANT);
+	clearInterval(tulip_scroll_timeout)
+	$("#tulips_explosion").stop().animate({'opacity': 0}, 2000*ANIMATION_CONSTANT);
+}
+
 function red_start() {
-	$("explosion#red_explosion").animate({'opacity': 0}, 0).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT).addClass("current");
-	var center_coords = {"x":win_width/2, "y": win_height/2};
-	$("#red_explosion word.center").css({"left":center_coords.x, "top": center_coords.y});
+	$("explosion#red_explosion").css({'opacity': 0}).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT).addClass("current");
+	var center_coords = {"x":((win_width/2)-($("#red_explosion word.center").width()/2)), "y": ((win_height/2)-($("#red_explosion word.center").height()))};
+	$("#red_explosion word.center").css({"left":center_coords.x, "top": center_coords.y, 'opacity': 0}).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT);
 	red_word_coordinates = [];
 	red_word_coordinates.push(center_coords);
 	$("#red_explosion word:not(.center)").each(function(){
@@ -128,7 +280,7 @@ function get_red_word_coordinates() {
 function red_word_animate(word) {
 	var coords = get_red_word_coordinates();
 	$(word)
-		.animate({'opacity': 0}, 0)
+		.css({'opacity': 0}, 0)
 		.show()
 		.css({"top": coords.y, "left": coords.x})
 		.delay(Math.random()*ANIMATION_CONSTANT*8000)
@@ -137,17 +289,72 @@ function red_word_animate(word) {
 }
 
 function red_mouseover() {
-	console.log($("tails",this).attr("possible"))
-	if (undefined !== $("tails",this).attr("possible") && $("tails",this).attr("possible") != ""){
-		var possible_tails = $("tails",this).attr("possible").split(",");
-		var tail_num = Math.round(Math.random() * possible_tails.length);
-		$("tails",this).html(possible_tails[tail_num]);
+	var word = $(this);
+	clearTimeout(red_word_fadeout_timeouts[$("heads",word).html()]);
+	if ( !word.hasClass("over") ) {
+		word.addClass("over");
+		if (undefined !== $("tails",this).attr("possible") && $("tails",this).attr("possible") != ""){
+			var possible_tails = $("tails",this).attr("possible").split(",");
+			var tail_num = Math.round(Math.random() * possible_tails.length);
+			$("tails",this).html(possible_tails[tail_num]);
+		}
+		$("tails",this).css({'opacity': 0}).show().animate({'opacity': 1}, 1000*ANIMATION_CONSTANT);
+		$("heads",this).css({'opacity': 1}).animate({'opacity': 0}, 1000*ANIMATION_CONSTANT);	
 	}
-	$("tails",this).show();
-	$("heads",this).hide();
+	
 	
 }
 function red_mouseout() {
-	$("tails",this).hide();
-	$("heads",this).show();
+	var word = $(this);
+	red_word_fadeout_timeouts[$("heads",word).html()] = setTimeout(function(){red_word_fadeout(word)}, 600); // ANIMATION_CONSTANT
+	
+}
+function red_word_fadeout(word) {
+	word.removeClass("over");
+	$("heads",word).css({'opacity': 0}).show().animate({'opacity': 1}, 1000*ANIMATION_CONSTANT);
+	$("tails",word).css({'opacity': 1}).animate({'opacity': 0}, 1000*ANIMATION_CONSTANT);
+	
+}
+
+function red_end() {
+	$("#red_explosion word:not(.center)").each(function(){
+		var word = $(this);
+		word.delay(Math.random()*ANIMATION_CONSTANT*5000)
+		.animate({'opacity': 0}, Math.random()*ANIMATION_CONSTANT*2000+(1000*ANIMATION_CONSTANT));
+	});
+	$("#red_explosion word.center").delay(ANIMATION_CONSTANT*4000)
+		.animate({'opacity': 0}, 4000*ANIMATION_CONSTANT);
+	$("poem").delay(8500*ANIMATION_CONSTANT).animate({"top":win_height/2 - $("poem").height()/2, "left": win_width/2 - $("poem").width()/2}, 2000*ANIMATION_CONSTANT);	
+	setTimeout(clear_main_animation_flag, 8500*ANIMATION_CONSTANT);
+}
+
+function softly_start() {
+	softly_delay_counter = 0;
+	$("explosion#softly_explosion").css({'opacity': 0}, 0).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT).addClass("current");
+	
+	animate_action("softly_delay_counter", "#softly_explosion line.shh1", 
+					"css({'top':win_height*0.7, 'left': win_width*0.8, 'opacity':0}).show().animate({'top':win_height*0.6, 'opacity': 1.0}, 2000*ANIMATION_CONSTANT, 'linear').animate({'top':win_height*0.2, 'opacity':0}, 8000*ANIMATION_CONSTANT, 'linear')", 15000*ANIMATION_CONSTANT);
+	
+	animate_action("softly_delay_counter", "#softly_explosion line.listen1", 
+					"css({'top':win_height*0.7, 'left': win_width*0.2, 'opacity': 0}).show().animate({'opacity': 1.0, 'top':win_height*0.622}, 2000*ANIMATION_CONSTANT, 'linear').animate({'top':0.3*win_height, 'opacity':0}, 7000*ANIMATION_CONSTANT, 'linear')", 9000*ANIMATION_CONSTANT);
+	
+	animate_action("softly_delay_counter", "#softly_explosion line.footsteps", 
+					"css({'top':win_height*0.8, 'left': win_width*0.5, 'opacity': 0}).show().animate({'opacity': 1.0, 'top':0.72*win_height}, 2000*ANIMATION_CONSTANT, 'linear').animate({'top':0.4*win_height, 'opacity':0}, 8000*ANIMATION_CONSTANT, 'linear')", 10000*ANIMATION_CONSTANT);
+
+	animate_action("softly_delay_counter", "#softly_explosion line.echo", 
+					"css({'top':win_height*0.6, 'left': 0.3*win_width, 'opacity': 0}).show().animate({'opacity': 1.0, 'left':win_width*0.375}, 4000*ANIMATION_CONSTANT, 'linear').animate({'left':win_width*0.6, 'opacity':0}, 12000*ANIMATION_CONSTANT, 'linear')", 16000*ANIMATION_CONSTANT);
+	
+	animate_action("softly_delay_counter", "#softly_explosion line.oak", 
+					"css({'top':win_height*0.7, 'left': win_width*0.7, 'opacity': 0}).show().animate({'opacity': 1.0, 'left':0.557*win_width}, 4000*ANIMATION_CONSTANT, 'linear').animate({'left':win_width*0.2, 'opacity':0}, 10000*ANIMATION_CONSTANT, 'linear')", 13000*ANIMATION_CONSTANT);
+	
+	// TODO: slow these down a teeny bit.
+	animate_action("softly_delay_counter", "#softly_explosion line.still", 
+					"css({'top':win_height*0.8, 'left': win_width*0.75, 'opacity': 0}).show().animate({'opacity': 1.0, 'left':0.6916*win_width}, 2000*ANIMATION_CONSTANT, 'linear').animate({'left':win_width*0.4, 'opacity':0}, 10000*ANIMATION_CONSTANT, 'linear')", 12000*ANIMATION_CONSTANT);
+	
+	animate_action("softly_delay_counter", "#softly_explosion line.shh2", 
+					"css({'top':win_height*0.7, 'left': win_width*0.7}).show().animate({'opacity': 1.0, 'top':win_height*0.566}, 6000*ANIMATION_CONSTANT, 'linear').animate({'top':0.3*win_height, 'opacity':0}, 12000*ANIMATION_CONSTANT, 'linear')", 18000*ANIMATION_CONSTANT);
+
+	animate_action("softly_delay_counter", "#softly_explosion line.listen2", 
+					"css({'top':win_height*0.5, 'left': win_width*0.5}).show().animate({'opacity': 0.4}, 4000*ANIMATION_CONSTANT, 'linear').animate({'opacity':0.16}, 8000*ANIMATION_CONSTANT, 'linear').animate({'opacity':0.03 }, 20000*ANIMATION_CONSTANT, 'linear').animate({'opacity':0.0}, 20000*ANIMATION_CONSTANT, 'linear')", 17000*ANIMATION_CONSTANT);
+		
 }

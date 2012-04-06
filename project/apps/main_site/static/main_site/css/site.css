@@ -30,15 +30,37 @@ h1.title {
 	display: none;
 	font-size: 30px;
 }
+#tulips_explosion {
+	width: 10000px;
+	overflow: hidden;
+	white-space: nowrap;
+}
 #tulips_explosion callout {
+	display: block;
+	position: absolute;
 	display: none;
+	font-size: 20px;
+	color: #AAA;
+	
+}
+#tulips_explosion word {
+	font-size: 48px;
+	display: block;
+	padding: 30px;
+	display: inline-block;
+	cursor: default;
+	color: #777;
+	position: relative;
+}
+#tulips_explosion word.current {
+	color: #000;
 }
 
 #red_explosion word {
 	background-color: transparent;
 	text-align: center;
 	position: absolute;
-	font-size: 20px;
+	font-size: 18px;
 	cursor: default;
 	min-width: 80px;
 	padding: 10px;
@@ -49,4 +71,22 @@ h1.title {
 
 #red_explosion word tails, #red_explosion word possible_tails {
 	display: none;
+	/* mouse-event pass through */
+	pointer-event: pass-through;
+}
+#red_explosion word heads, #red_explosion word tails {
+	position: absolute;
+	left: 0px;
+	text-align: center;
+	width: 100%;
+}
+
+
+#softly_explosion line {
+	position: absolute;
+	opacity: 0.0;
+	color: #000;
+	font-size: 24px;
+	width: 500px;
+
 }
