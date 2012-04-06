@@ -98,8 +98,9 @@ function poem_word_clicked() {
 			switch (id) {
 
 				case "tulips":
-					start_tulips();
 					setTimeout(clear_main_animation_flag, 2000*ANIMATION_CONSTANT);
+					$("poem").animate({"top":win_height-35, "left": win_width-90}, 2000*ANIMATION_CONSTANT);
+					setTimeout(start_tulips, 3000*ANIMATION_CONSTANT)
 					has_seen_tulips = true;
 					break;
 
@@ -157,13 +158,13 @@ function poem_moused_over() {
 }
 function poem_word_moused_over() {
 	var word = $(this);
-	word.animate({'opacity': 0.9}, 200*ANIMATION_CONSTANT);
+	word.stop().animate({'opacity': 0.9}, 200*ANIMATION_CONSTANT);
 
-	$("poem word:not(." + word.attr("class") + ")").animate({'opacity': 0.4}, 200*ANIMATION_CONSTANT);
+	$("poem word:not(." + word.attr("class") + ")").stop().animate({'opacity': 0.4}, 200*ANIMATION_CONSTANT);
 }
 
 function poem_moused_out() {
-	$("poem word").animate({'opacity': 0.7}, 500*ANIMATION_CONSTANT);
+	$("poem word").stop().animate({'opacity': 0.7}, 500*ANIMATION_CONSTANT);
 }
 
 function tulips_mouseover() {
@@ -215,10 +216,8 @@ function tulip_mousemoved(e) {
 function start_tulips() {
 	tulip_scroll_speed = 0.5;
 	$(window).bind("mousemove.tulips", tulip_mousemoved);
-	$("poem").animate({"top":win_height-35, "left": win_width-90}, 2000*ANIMATION_CONSTANT);
 	$("#tulips_explosion word").css({'margin-top': tulip_scroll_top_cutoff})
 
-	
 
 	$("explosion#tulips_explosion")
 		.css({'opacity': 0, 'width':win_width, 'height':win_height, 'display': 'block', })
