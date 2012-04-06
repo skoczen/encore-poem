@@ -1,5 +1,7 @@
 {% extends "base.html" %}{% load compress %}
 
+{% block head %}encore - a digital poem{% endblock %}
+
 {% block css %}{{block.super}}
 {% compress css %}
 <link rel="stylesheet" href="{{STATIC_URL}}main_site/css/fonts.css">
@@ -79,6 +81,9 @@
 		327 blades of grass
 	</callout>
 	</word>
+	<word callout_id="mycelia">mycelia<callout callout_id="mycelia">
+	</callout>
+	</word>
 	<word callout_id="rain">rain<callout callout_id="rain" class="below">
 		india<br/>
 		sulawesi<br/>
@@ -90,9 +95,6 @@
 		spilled glass<br/>
 		pacific ocean<br/>
 		field
-	</callout>
-	</word>
-	<word callout_id="mycelia">mycelia<callout callout_id="mycelia">
 	</callout>
 	</word>
 
@@ -130,11 +132,11 @@
 	</callout>
 	</word>
 
-	<word callout_id="expansion_of_cells">expansion of cells<callout callout_id="expansion_of_cells">
+<!-- 	<word callout_id="expansion_of_cells">expansion of cells<callout callout_id="expansion_of_cells">
 		elongation tilting photosensitive
 	</callout>
 	</word>
-
+ -->
 	<word callout_id="bud">a bud forms<callout callout_id="bud">
 		bulbous, pregnant, pressure built from rainwater and lust
 	</callout>
@@ -203,8 +205,8 @@
 		their chirping.
 	</callout>
 	<callout callout_id="gust" class="below">		
-		the sky is on<br/>
-		fire<br/>
+		the sky 
+		on fire<br/>
 		it bleeds.
 	</callout>
 	</word>
@@ -225,13 +227,13 @@
 	</word>
 
 	<word callout_id="fading">fading<callout callout_id="fading">
-		worn down<br/>
-		pigment by pigment
+		<!-- worn down<br/>
+		pigment by pigment -->
 	</callout>
 	</word>
 
 	<word callout_id="kink">a kink<callout callout_id="kink" class="below">
-		main vein<br/>
+		vein<br/>
 		pinched,<br/>
 		no more water<br/>
 		no more iron<br/>
@@ -250,7 +252,8 @@
 		just a stem<br/>
 		now to weak <br/>
 		to hold<br/>
-		its prize
+		its star<br/>
+		in orbit
 	</callout>
 	</word>
 
@@ -290,6 +293,10 @@
 		327 blades of grass
 	</callout>
 	</word>
+
+	<word callout_id="mycelia">mycelia<callout callout_id="mycelia">
+	</callout>
+	</word>
 	<word callout_id="rain">rain<callout callout_id="rain" class="below">
 		india<br/>
 		sulawesi<br/>
@@ -301,9 +308,6 @@
 		spilled glass<br/>
 		pacific ocean<br/>
 		field
-	</callout>
-	</word>
-	<word callout_id="mycelia">mycelia<callout callout_id="mycelia">
 	</callout>
 	</word>
 
