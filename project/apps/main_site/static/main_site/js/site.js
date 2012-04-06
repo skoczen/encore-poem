@@ -35,6 +35,7 @@ $(function(){
 	$("#red_explosion word").bind("mouseout", red_mouseout);
 	$("#tulips_explosion word:not(.center)").bind("mouseover", tulips_mouseover);
 	$("#tulips_explosion word:not(.center)").bind("mouseout", tulips_mouseout);
+	$("#wilted_explosion line").bind("mouseover", wilted_line_hovered);
 });
 
 function animate_action(counter_name, target, action, wait_after) {
@@ -115,8 +116,7 @@ function poem_word_clicked() {
 					break;
 
 				case "wilted":
-					$("poem").animate({"top":-35, "left": -70}, 2000*ANIMATION_CONSTANT);	
-					$("explosion#"+id+"_explosion").css({'opacity': 0}).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT).addClass("current");
+					start_wilted();
 					setTimeout(clear_main_animation_flag, 2000*ANIMATION_CONSTANT);
 					has_seen_wilted = true;
 					break;
@@ -357,4 +357,35 @@ function softly_start() {
 	animate_action("softly_delay_counter", "#softly_explosion line.listen2", 
 					"css({'top':win_height*0.5, 'left': win_width*0.5}).show().animate({'opacity': 0.4}, 4000*ANIMATION_CONSTANT, 'linear').animate({'opacity':0.16}, 8000*ANIMATION_CONSTANT, 'linear').animate({'opacity':0.03 }, 20000*ANIMATION_CONSTANT, 'linear').animate({'opacity':0.0}, 20000*ANIMATION_CONSTANT, 'linear')", 17000*ANIMATION_CONSTANT);
 		
+}
+
+function start_wilted() {
+	$("poem").animate({"top":-35, "left": -70}, 2000*ANIMATION_CONSTANT);	
+	$("explosion#wilted_explosion")
+		.css({'opacity': 0, 'display':'block', 'width':win_width, 'height':win_height})
+		.animate({'opacity': 1}, 2000*ANIMATION_CONSTANT)
+		.addClass("current");
+	$("#wilted_explosion stanza").css({'opacity':0}).delay(3000*ANIMATION_CONSTANT).animate({'opacity':1}, 2000*ANIMATION_CONSTANT);
+	$("#wilted_explosion stanza line:first").delay(5000*ANIMATION_CONSTANT).animate({'opacity':0.1}, 1000*ANIMATION_CONSTANT);
+}
+
+function wilted_line_hovered() {
+	var all_above_me_hovered = true;
+	var stop_tracking = false;
+	var line = $(this);
+
+	$("#wilted_explosion line").each(function(){
+		var l = $(this);
+		if (l.text() == line.text()) {
+			stop_tracking = true;
+		}
+		if (!l.hasClass("has_been_hovered") && !stop_tracking) {
+			all_above_me_hovered = false;
+		}
+	})
+	if (all_above_me_hovered) {
+		line.stop().animate({'opacity': 0.5}, 1000*ANIMATION_CONSTANT).animate({'opacity': 0.02}, 10000*ANIMATION_CONSTANT)
+		line.addClass("has_been_hovered");	
+	}
+	
 }

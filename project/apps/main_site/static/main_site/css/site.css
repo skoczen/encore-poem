@@ -90,3 +90,28 @@ h1.title {
 	width: 500px;
 
 }
+#wilted_explosion {
+	position: absolute;
+	display: none;
+	overflow: auto;
+}
+
+#wilted_explosion stanza {
+	padding: 100px 0px 0px 30%;
+	display: block;
+	width: 70%;
+	opacity: 0.0;
+}
+
+#wilted_explosion line {
+	position: relative;
+	display: block;
+	font-size: 24px;
+	margin: 0px 0px 20px 0px;
+	opacity: 0.01;
+	cursor: default;
+}
+
+#wilted_explosion line:hover {
+	/*opacity: 0.8;*/
+}
