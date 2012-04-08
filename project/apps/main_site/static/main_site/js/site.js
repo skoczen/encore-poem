@@ -1,4 +1,5 @@
 var ANIMATION_CONSTANT = 1;
+var SLOWLY_CONSTANT = 0.7;
 var MIN_RED_WORD_DISTANCE = 40;
 var RED_WORD_PADDING = 80;
 var win_height, win_width;
@@ -201,7 +202,7 @@ function tulips_mouseout() {
 
 function tulip_mousemoved(e) {
 	// if (e.pageY < tulip_scroll_top_cutoff || e.pageY > tulip_scroll_bottom_cutoff ) {
-		tulip_scroll_speed = (e.pageX / win_width) - 0.4;
+		tulip_scroll_speed = (e.pageX / win_width) - 0.3;
 		if ( Math.abs(tulip_scroll_speed) < 0.05 ) {
 			tulip_scroll_speed = 0;
 		} else {
@@ -238,10 +239,11 @@ function start_tulips() {
 		.animate({'opacity': 1}, 2000*ANIMATION_CONSTANT)
 		.addClass("current");
 
-	setTimeout(start_tulip_scroll, 2050);
+	setTimeout(start_tulip_scroll, 1500);
 }
 
 function start_tulip_scroll() {
+	tulip_scroll_speed = 0.1;
 	tulip_scroll_timeout = setInterval(tulipscroll, TULIP_SCROLL_INTERVAL_TIME);
 }
 
@@ -271,7 +273,7 @@ function animate_out_word(word){
 	var opacity = (word.css('opacity')*1.0)-0.1;
 	word.css('opacity', opacity);
 	if (opacity > 0) {
-		setTimeout(function(){animate_out_word(word)}, 100);	
+		setTimeout(function(){animate_out_word(word)}, 50);	
 	} else {
 		word.css('opacity', 0);	
 	}
@@ -301,6 +303,7 @@ function end_tulips() {
 		$(window).unbind("mousemove.tulips");
 		$("poem").animate({"top":win_height/2 - $("poem").height()/2, "left": win_width/2 - $("poem").width()/2}, 2000*ANIMATION_CONSTANT);	
 		$("#tulips_explosion").hide();
+		$("#tulips_explosion word").css({'opacity':1});
 	}, timeout_counter);
 }
 
@@ -381,43 +384,43 @@ function red_word_fadeout(word) {
 function red_end() {
 	$("#red_explosion word:not(.center)").each(function(){
 		var word = $(this);
-		word.delay(Math.random()*ANIMATION_CONSTANT*5000)
+		word.delay(Math.random()*ANIMATION_CONSTANT*1500)
 		.animate({'opacity': 0}, Math.random()*ANIMATION_CONSTANT*2000+(1000*ANIMATION_CONSTANT));
 	});
-	$("#red_explosion word.center").delay(ANIMATION_CONSTANT*4000)
+	$("#red_explosion word.center").delay(ANIMATION_CONSTANT*1000)
 		.animate({'opacity': 0}, 4000*ANIMATION_CONSTANT);
-	$("poem").delay(8500*ANIMATION_CONSTANT).animate({"top":win_height/2 - $("poem").height()/2, "left": win_width/2 - $("poem").width()/2}, 2000*ANIMATION_CONSTANT);	
-	setTimeout(clear_main_animation_flag, 8500*ANIMATION_CONSTANT);
+	$("poem").delay(5000*ANIMATION_CONSTANT).animate({"top":win_height/2 - $("poem").height()/2, "left": win_width/2 - $("poem").width()/2}, 2000*ANIMATION_CONSTANT);	
+	setTimeout(clear_main_animation_flag, 5000*ANIMATION_CONSTANT);
 }
 
 function softly_start() {
 	softly_delay_counter = 0;
-	$("explosion#softly_explosion").css({'opacity': 0}, 0).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT).addClass("current");
+	$("explosion#softly_explosion").css({'opacity': 0}, 0).show().animate({'opacity': 1}, 2000*ANIMATION_CONSTANT*SLOWLY_CONSTANT).addClass("current");
 	
 	animate_action("softly_delay_counter", "#softly_explosion line.shh1", 
-					"css({'top':win_height*0.7, 'left': win_width*0.8, 'opacity':0}).show().animate({'top':win_height*0.6, 'opacity': 1.0}, 2000*ANIMATION_CONSTANT, 'linear').animate({'top':win_height*0.2, 'opacity':0}, 8000*ANIMATION_CONSTANT, 'linear')", 15000*ANIMATION_CONSTANT);
+					"css({'top':win_height*0.7, 'left': win_width*0.8, 'opacity':0}).show().animate({'top':win_height*0.6, 'opacity': 1.0}, 2000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear').animate({'top':win_height*0.2, 'opacity':0}, 8000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear')", 15000*ANIMATION_CONSTANT*SLOWLY_CONSTANT);
 	
 	animate_action("softly_delay_counter", "#softly_explosion line.listen1", 
-					"css({'top':win_height*0.7, 'left': win_width*0.2, 'opacity': 0}).show().animate({'opacity': 1.0, 'top':win_height*0.622}, 2000*ANIMATION_CONSTANT, 'linear').animate({'top':0.3*win_height, 'opacity':0}, 7000*ANIMATION_CONSTANT, 'linear')", 9000*ANIMATION_CONSTANT);
+					"css({'top':win_height*0.7, 'left': win_width*0.2, 'opacity': 0}).show().animate({'opacity': 1.0, 'top':win_height*0.622}, 2000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear').animate({'top':0.3*win_height, 'opacity':0}, 7000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear')", 9000*ANIMATION_CONSTANT*SLOWLY_CONSTANT);
 	
 	animate_action("softly_delay_counter", "#softly_explosion line.footsteps", 
-					"css({'top':win_height*0.8, 'left': win_width*0.5, 'opacity': 0}).show().animate({'opacity': 1.0, 'top':0.72*win_height}, 2000*ANIMATION_CONSTANT, 'linear').animate({'top':0.4*win_height, 'opacity':0}, 8000*ANIMATION_CONSTANT, 'linear')", 10000*ANIMATION_CONSTANT);
+					"css({'top':win_height*0.8, 'left': win_width*0.5, 'opacity': 0}).show().animate({'opacity': 1.0, 'top':0.72*win_height}, 2000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear').animate({'top':0.4*win_height, 'opacity':0}, 8000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear')", 10000*ANIMATION_CONSTANT*SLOWLY_CONSTANT);
 
 	animate_action("softly_delay_counter", "#softly_explosion line.echo", 
-					"css({'top':win_height*0.6, 'left': 0.3*win_width, 'opacity': 0}).show().animate({'opacity': 1.0, 'left':win_width*0.375}, 4000*ANIMATION_CONSTANT, 'linear').animate({'left':win_width*0.6, 'opacity':0}, 12000*ANIMATION_CONSTANT, 'linear')", 16000*ANIMATION_CONSTANT);
+					"css({'top':win_height*0.6, 'left': 0.3*win_width, 'opacity': 0}).show().animate({'opacity': 1.0, 'left':win_width*0.375}, 4000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear').animate({'left':win_width*0.6, 'opacity':0}, 12000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear')", 16000*ANIMATION_CONSTANT*SLOWLY_CONSTANT);
 	
 	animate_action("softly_delay_counter", "#softly_explosion line.oak", 
-					"css({'top':win_height*0.7, 'left': win_width*0.7, 'opacity': 0}).show().animate({'opacity': 1.0, 'left':0.584*win_width}, 4000*ANIMATION_CONSTANT, 'linear').animate({'left':win_width*0.2, 'opacity':0}, 13000*ANIMATION_CONSTANT, 'linear')", 16000*ANIMATION_CONSTANT);
+					"css({'top':win_height*0.7, 'left': win_width*0.7, 'opacity': 0}).show().animate({'opacity': 1.0, 'left':0.584*win_width}, 4000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear').animate({'left':win_width*0.2, 'opacity':0}, 13000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear')", 16000*ANIMATION_CONSTANT*SLOWLY_CONSTANT);
 	
 	// TODO: slow these down a teeny bit.
 	animate_action("softly_delay_counter", "#softly_explosion line.still", 
-					"css({'top':win_height*0.8, 'left': win_width*0.75, 'opacity': 0}).show().animate({'opacity': 1.0, 'left':0.7033*win_width}, 2000*ANIMATION_CONSTANT, 'linear').animate({'left':win_width*0.4, 'opacity':0}, 13000*ANIMATION_CONSTANT, 'linear')", 15000*ANIMATION_CONSTANT);
+					"css({'top':win_height*0.8, 'left': win_width*0.75, 'opacity': 0}).show().animate({'opacity': 1.0, 'left':0.7033*win_width}, 2000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear').animate({'left':win_width*0.4, 'opacity':0}, 13000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear')", 15000*ANIMATION_CONSTANT*SLOWLY_CONSTANT);
 	
 	animate_action("softly_delay_counter", "#softly_explosion line.shh2", 
-					"css({'top':win_height*0.7, 'left': win_width*0.7}).show().animate({'opacity': 1.0, 'top':win_height*0.566}, 6000*ANIMATION_CONSTANT, 'linear').animate({'top':0.3*win_height, 'opacity':0}, 12000*ANIMATION_CONSTANT, 'linear')", 18000*ANIMATION_CONSTANT);
+					"css({'top':win_height*0.7, 'left': win_width*0.7}).show().animate({'opacity': 1.0, 'top':win_height*0.566}, 6000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear').animate({'top':0.3*win_height, 'opacity':0}, 12000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear')", 18000*ANIMATION_CONSTANT*SLOWLY_CONSTANT);
 
 	animate_action("softly_delay_counter", "#softly_explosion line.listen2", 
-					"css({'top':win_height*0.5, 'left': win_width*0.5}).show().animate({'opacity': 0.4}, 4000*ANIMATION_CONSTANT, 'linear').animate({'opacity':0.16}, 8000*ANIMATION_CONSTANT, 'linear').animate({'opacity':0.03 }, 20000*ANIMATION_CONSTANT, 'linear').animate({'opacity':0.0}, 20000*ANIMATION_CONSTANT, 'linear')", 17000*ANIMATION_CONSTANT);
+					"css({'top':win_height*0.5, 'left': win_width*0.5}).show().animate({'opacity': 0.4}, 4000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear').animate({'opacity':0.16}, 8000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear').animate({'opacity':0.03 }, 20000*ANIMATION_CONSTANT*SLOWLY_CONSTANT, 'linear').animate({'opacity':0.0}, 20000*ANIMATION_CONSTANT, 'linear')", 17000*ANIMATION_CONSTANT);
 		
 }
 

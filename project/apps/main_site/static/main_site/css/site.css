@@ -1,6 +1,8 @@
 body, html {
 	overflow: hidden;
 }
+::-moz-selection { background: transparent; color: inherit; text-shadow: none; }
+::selection { background: transparent; color: inherit; text-shadow: none; }
 poem {
 	position: absolute;
 	text-align: center;
