@@ -28,12 +28,12 @@ $(function(){
 	animate_action("main_delay_counter", "h1.title", "fadeIn(1000*ANIMATION_CONSTANT)", 4000);
 	animate_action("main_delay_counter", "h1.title", "fadeOut(1000*ANIMATION_CONSTANT)", 2000);
 
-	$("poem").delay(6000).css("top",win_height/2 - $("poem").height()/2);
+	$("poem").delay(6000*ANIMATION_CONSTANT).css("top",win_height/2 - $("poem").height()/2);
 	make_visible_and_animate_in("main_delay_counter", "poem word.tulips", 1000, 1000);
 	make_visible_and_animate_in("main_delay_counter", "poem word.red", 1000, 2000);
 	make_visible_and_animate_in("main_delay_counter", "poem word.softly", 1000, 1000);
 	make_visible_and_animate_in("main_delay_counter", "poem word.wilted", 1000, 1000);
-	setTimeout(bind_mouse_actions, 11000);
+	setTimeout(bind_mouse_actions, 11000*ANIMATION_CONSTANT);
 	
 });
 
@@ -179,30 +179,41 @@ function poem_moused_out() {
 function tulips_mouseover() {
 	var word = $(this);
 	word.addClass("current");
+	word.stop().animate({color: "#454545"}, 600);
 	var callouts = $("callout[callout_id=" + $(this).attr("callout_id") + "]");
 	callouts.each(function(){
 		var callout = $(this);
 		var top = false;
 		if (callout.hasClass("below")){
-			top = word.height()+ 40;
+			top = word.height()+ 60;
 		} else {
 			top = -1*callout.height() + 10;
 		}
-		callout.css({'display':'block', 'top': "-10000"}).css({'top':top });
+		if (callout.hasClass("centered")) {
+			callout.css({'margin-left':(-0.4*(callout.width()-word.width()))});
+		}
+		callout.css({'top':top}).show().stop().delay(400).animate({'opacity':1}, 1400);
 	});
-	
 
 }
 function tulips_mouseout() {
 	var word = $(this);
+	word.stop().animate({color: "#D0D0D0"}, 1600);
+	setTimeout(function(){fade_out_callout(word);}, 500*ANIMATION_CONSTANT);
 	word.removeClass("current");
-	var callout = $("callout[callout_id=" + $(this).attr("callout_id") + "]");
-	callout.hide();
+}
+
+function fade_out_callout(word) {
+	if (!word.hasClass("current")) {
+		var callout = $("callout[callout_id=" + word.attr("callout_id") + "]");
+		callout.stop().animate({'opacity': 0}, 2000, function(){$(this).hide();})	
+	}
+	
 }
 
 function tulip_mousemoved(e) {
 	// if (e.pageY < tulip_scroll_top_cutoff || e.pageY > tulip_scroll_bottom_cutoff ) {
-		tulip_scroll_speed = (e.pageX / win_width) - 0.3;
+		tulip_scroll_speed = (e.pageX / win_width) - 0.2;
 		if ( Math.abs(tulip_scroll_speed) < 0.05 ) {
 			tulip_scroll_speed = 0;
 		} else {
@@ -230,7 +241,7 @@ function start_tulips() {
 		.css({'opacity': 0, 'width':win_width, 'height':win_height, 'display': 'block', })
 		.animate({scrollLeft: 0}, 0);
 	$("#tulips_explosion word").css({'margin-top': tulip_scroll_top_cutoff, 'opacity':1});
-
+	$("#tulips_explosion word callout").css({'opacity':0, 'display':'block', 'top': "-10000"}).show().css({'top':top });
 
 	soil_1_initial_position = $("#soil_1").position().left;
 	soil_2_initial_position = $("#soil_word_2").position().left;
@@ -239,7 +250,7 @@ function start_tulips() {
 		.animate({'opacity': 1}, 2000*ANIMATION_CONSTANT)
 		.addClass("current");
 
-	setTimeout(start_tulip_scroll, 1500);
+	setTimeout(start_tulip_scroll, 2000);
 }
 
 function start_tulip_scroll() {
@@ -261,7 +272,7 @@ function tulipscroll() {
 	}
 	
 
-	var speed =  (tulip_scroll_speed * 16);
+	var speed =  (tulip_scroll_speed * 12);
 	
 	var scroll_string = "+="+ speed;
 	$("#tulips_explosion").stop().animate({
@@ -304,6 +315,8 @@ function end_tulips() {
 		$("poem").animate({"top":win_height/2 - $("poem").height()/2, "left": win_width/2 - $("poem").width()/2}, 2000*ANIMATION_CONSTANT);	
 		$("#tulips_explosion").hide();
 		$("#tulips_explosion word").css({'opacity':1});
+		$("#tulips_explosion callout").css({'opacity':1});
+
 	}, timeout_counter);
 }
 
@@ -391,6 +404,7 @@ function red_end() {
 		.animate({'opacity': 0}, 4000*ANIMATION_CONSTANT);
 	$("poem").delay(5000*ANIMATION_CONSTANT).animate({"top":win_height/2 - $("poem").height()/2, "left": win_width/2 - $("poem").width()/2}, 2000*ANIMATION_CONSTANT);	
 	setTimeout(clear_main_animation_flag, 5000*ANIMATION_CONSTANT);
+	setTimeout(function() {$("#red_explosion word").hide();},7000*ANIMATION_CONSTANT);
 }
 
 function softly_start() {
@@ -448,8 +462,8 @@ function wilted_line_hovered() {
 			all_above_me_hovered = false;
 		}
 	})
-	if (all_above_me_hovered) {
-		line.stop().animate({'opacity': 0.5}, 1000*ANIMATION_CONSTANT).animate({'opacity': 0.02}, 10000*ANIMATION_CONSTANT)
+	if (all_above_me_hovered && !line.hasClass("hovering")) {
+		line.stop().addClass("hovering").animate({'opacity': 0.5}, 1000*ANIMATION_CONSTANT).animate({'opacity': 0.02}, 10000*ANIMATION_CONSTANT, function(){$(this).removeClass("hovering");})
 		line.addClass("has_been_hovered");	
 	}
 	

@@ -42,7 +42,7 @@ h1.title {
 	position: absolute;
 	display: none;
 	font-size: 20px;
-	color: #AAA;
+	color: #777;
 	
 }
 #tulips_explosion word {
@@ -51,11 +51,11 @@ h1.title {
 	padding: 30px;
 	display: inline-block;
 	cursor: default;
-	color: #777;
+	color: #CCC;
 	position: relative;
 }
 #tulips_explosion word.current {
-	color: #000;
+	/*color: #333;*/
 }
 
 #red_explosion word {
