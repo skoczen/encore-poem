@@ -1,5 +1,6 @@
 import optparse
 from django.core.management.base import BaseCommand, CommandError
+from os import makedirs
 from os.path import abspath, dirname, join
 from sys import argv
 import urllib2
@@ -41,6 +42,7 @@ class Command(BaseCommand):
         self.AWS_STORAGE_BUCKET_NAME = settings.AWS_STORAGE_BUCKET_NAME
 
         project_root =  abspath(dirname(argv[0]))
+        makedirs(join(project_root, settings.STATIC_ROOT, CACHE_DIR))
         do_download = options.get('force')
 
         try:

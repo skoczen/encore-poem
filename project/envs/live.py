@@ -1,6 +1,6 @@
 from envs.common import *
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 EMAIL_BACKEND = 'django_ses.SESBackend'
@@ -14,3 +14,4 @@ STATICFILES_STORAGE = "backends.CachedS3BotoStorage"
 COMPRESS_STORAGE = STATICFILES_STORAGE
 
 COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
