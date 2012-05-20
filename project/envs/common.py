@@ -110,7 +110,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.static",
     "django.core.context_processors.request",
 )
-
+GAUGES_SITE_ID = "4fb86969613f5d31b8000026"
+GOOGLE_ANALYTICS_PROPERTY_ID = "UA-31887587-1"
 
 STATICFILES_EXCLUDED_APPS = []
 COMPRESS_ROOT = STATIC_ROOT
