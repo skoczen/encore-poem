@@ -4,6 +4,11 @@
 {% block description %}a digital poem{% endblock %}
 {# {% block description %}Printed word is fading. This is a new beginning.{% endblock %} #}
 
+{% block og-title %}encore{% endblock %}
+{% block og-description %}a digital poem{% endblock %}
+{% block og-image %}{{STATIC_URL}}main_site/img/opengraph.png{% endblock %}
+
+
 {% block css %}{{block.super}}
 {% compress css %}
 <link rel="stylesheet" href="{{STATIC_URL}}main_site/css/fonts.css">
