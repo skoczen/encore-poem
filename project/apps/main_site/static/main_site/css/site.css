@@ -1,9 +1,7 @@
 body, html {
 	overflow: hidden;
 }
-.opengraph-image {
-	background: url("../img/opengraph.png");
-}
+
 ::-moz-selection { background: transparent; color: inherit; text-shadow: none; }
 ::selection { background: transparent; color: inherit; text-shadow: none; }
 poem {
